@@ -279,6 +279,7 @@ def failAndIO: OptionT[IO, Unit] =
 	\node[circle, fill=black!5, draw, minimum size=3 cm,label=above:{\mintinline{scala}{M}}, label=below:{\mintinline{scala}{StateT[S, M[_], _]}}] {};
 	\node[circle, fill=black!20, draw, minimum size=1.5 cm,label=above:{\mintinline{scala}{State}}] {};
 \end{tikzpicture}
+\begin{tcolorbox}
 \begin{minted}{scala}
 final case class StateT[S, M[_], A](runStateT: S => M[(A, S)])
 
@@ -287,6 +288,7 @@ type StateTFixS[S] = [M[_], A] =>> StateT[S, M, A]
     def lift[M[_]: Monad, A](m: M[A]): StateT[S, M, A] =
       StateT(s => m.map((_, s)))
 \end{minted}
+\end{tcolorbox}
 \end{center}
 \end{frame}
 \begin{frame}[fragile]{Monad Transformers -- StateT}
