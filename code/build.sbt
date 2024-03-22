@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 val scala3Version = "3.3.1"
+=======
+val scala3Version = "3.2.1"
+>>>>>>> d35be0f (:rocket: slides)
 
 lazy val root = project
   .in(file("."))
@@ -12,4 +16,8 @@ lazy val root = project
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "requests" % "0.8.0",
     )
+<<<<<<< HEAD
   )
+=======
+  )
+>>>>>>> d35be0f (:rocket: slides)

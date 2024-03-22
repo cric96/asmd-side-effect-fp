@@ -25,6 +25,7 @@
 \usepackage[ddmmyyyy]{datetime}
 \usepackage{xpatch}
 \usepackage{tcolorbox}
+\usepackage{hyperref}
 \xpretocmd{\inputminted}{\begin{tcolorbox}}{}{}%
 \xapptocmd{\inputminted}{\end{tcolorbox}}{}{}%
 
@@ -38,7 +39,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title[It's all about effects]
-{Effect systems in Functional Programming}
+{It's all about effects}
 %
 \subtitle[Effect systems in Functional Programming]
 {Effect systems in Functional Programming}
@@ -51,7 +52,9 @@
 %
 \setminted[scala]{fontsize=\footnotesize, tabsize=2}
 \renewcommand{\dateseparator}{/}
-\date[\today]{\today}
+\date[\today]{\today \\
+\url{https://github.com/cric96/asmd-side-effect-fp}
+}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
@@ -140,7 +143,7 @@ An \emph{effect system} is a type system that tracks the \emph{effects} of a pro
 		\item It is a \emph{pure} way to model side effects
 	\end{itemize}
 \end{exampleblock}
-\inputminted[firstline=6,lastline=17]{scala}{code/src/main/scala/scala/monads/IO.scala}
+\inputminted[firstline=6,lastline=17]{scala}{code/src/main/scala/monads/IO.scala}
 \end{frame}
 
 \begin{frame}{IO usage}
@@ -152,7 +155,7 @@ An \emph{effect system} is a type system that tracks the \emph{effects} of a pro
 	\end{itemize}
 	\item After composing the I/O operations, we can run the program (i.e., the end of the world)
 \end{itemize}
-\inputminted[firstline=42,lastline=48]{scala}{code/src/main/scala/scala/monads/IO.scala}
+\inputminted[firstline=42,lastline=48]{scala}{code/src/main/scala/monads/IO.scala}
 \end{frame}
 
 \begin{frame}{Composing effects}
@@ -176,11 +179,11 @@ An \emph{effect system} is a type system that tracks the \emph{effects} of a pro
 \begin{itemize}
 	\item A parser is a program that takes a string and returns an Option of a parsed value and the remaining string
 \end{itemize}
-\inputminted[firstline=5, lastline=5]{scala}{code/src/main/scala/scala/monads/Parser.scala}
+\inputminted[firstline=5, lastline=5]{scala}{code/src/main/scala/monads/Parser.scala}
 \begin{itemize}
 	\item A Parser can be modelled as a monad
 \end{itemize}
-\inputminted[firstline=7, lastline=17]{scala}{code/src/main/scala/scala/monads/Parser.scala}
+\inputminted[firstline=7, lastline=17]{scala}{code/src/main/scala/monads/Parser.scala}
 
 \end{frame}
 \begin{frame}[fragile]{Motivating Example -- Parser}
@@ -486,7 +489,7 @@ def update[S, M[_]: Monad: HasState[S]](f: S => S): M[Unit] =
 	yield f"The result is $newState"
 
 // decoupling the effect from the implementation
-effects[StateT[Int, IO, _], _].runStateT(10).unsafeRun()
+effects[StateT[Int, IO, _]].runStateT(10).unsafeRun()
 \end{minted}
 \end{tcolorbox}
 
