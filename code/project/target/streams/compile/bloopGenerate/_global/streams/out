@@ -1,0 +1,4 @@
+[debug] [code-build] Classpath dependencies List()
+[debug] [code-build] Dependencies from configurations List()
+[debug] Bloop wrote the configuration of project 'code-build' to '/home/gianluca/asmd-side-effect-fp/code/project/.bloop/code-build.json'
+[success] Generated .bloop/code-build.json
