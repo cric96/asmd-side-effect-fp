@@ -38,14 +38,14 @@ object Design:
         case Some(user) => updateOrDelete(user)(f)
         case None       => Monad.pure(())
       }
-    // format: on
 
     def updateAge[M[_]: Monad: UserStore](userId: UserId) =
-      updateOrDelete(userId) { user =>
-        if user.age < 18
-        then Delete
-        else user.copy(age = user.age + 1)
-      }
+      updateOrDelete(userId):
+        user =>
+          if user.age < 18
+          then Delete
+          else user.copy(age = user.age + 1)
+
 
     object Production:
       final case class DatabaseConnection()

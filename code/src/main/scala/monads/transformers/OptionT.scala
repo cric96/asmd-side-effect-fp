@@ -14,11 +14,9 @@ object OptionT:
     extension [A](t: OptionT[M, A])
       def flatMap[B](f: A => OptionT[M, B]): OptionT[M, B] =
         OptionT(
-          t.runOptionT.flatMap(option =>
-            option match
-              case Some(a) => f(a).runOptionT
-              case None    => Monad.pure(None)
-          )
+          t.runOptionT.flatMap:
+            case Some(a) => f(a).runOptionT
+            case None    => Monad.pure(None)
         )
 
   given MonadTransformer[OptionT] with

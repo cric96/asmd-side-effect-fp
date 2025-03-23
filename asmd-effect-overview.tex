@@ -6,7 +6,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\documentclass[handout]{beamer}\mode<handout>{\usetheme{default}}
 %
-\documentclass[presentation, 10pt]{beamer}\mode<presentation>{\usetheme{AMSBolognaFC}}
+\documentclass[presentation, 10pt]{beamer}\mode<presentation>{\usetheme{metropolis}}
 %\documentclass[handout]{beamer}\mode<handout>{\usetheme{AMSBolognaFC}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -26,8 +26,8 @@
 \usepackage{xpatch}
 \usepackage{tcolorbox}
 \usepackage{hyperref}
-\xpretocmd{\inputminted}{\begin{tcolorbox}}{}{}%
-\xapptocmd{\inputminted}{\end{tcolorbox}}{}{}%
+%\xpretocmd{\inputminted}{\begin{tcolorbox}}{}{}%
+%\xapptocmd{\inputminted}{\end{tcolorbox}}{}{}%
 
 \renewcommand{\dateseparator}{}
 
@@ -43,9 +43,10 @@
 %
 \subtitle[Effect systems in Functional Programming]
 {Effect systems in Functional Programming}
+
 %
-\author[\sspeaker{Aguzzi}]
-{\speaker{Gianluca Aguzzi} \href{mailto:gianluca.aguzzi@unibo.it}{gianluca.aguzzi@unibo.it}}
+\author[Aguzzi]
+{Gianluca Aguzzi, \href{mailto:gianluca.aguzzi@unibo.it}{gianluca.aguzzi@unibo.it}}
 %
 \institute[DISI, Univ.\ Bologna]
 {Dipartimento di Informatica -- Scienza e Ingegneria (DISI)\\\textsc{Alma Mater Studiorum} -- Universit{\`a} di Bologna}
@@ -66,12 +67,12 @@
 \frame{\titlepage}
 %/////////
 %% print toc
-\begin{frame}{Outline}
-	\tableofcontents
-\end{frame}
+%\begin{frame}{Outline}
+%	\tableofcontents
+%\end{frame}
 
 \begin{frame}{Acknowledgments}
-	This presentation is mainly based on the work of \emph{Giacomo Cavalieri} that i would like to thank for his work and his support.
+	This presentation is mainly based on the work of \emph{Giacomo Cavalieri} that I would like to thank for his work and his support.
 	
 	Any error or misunderstanding is my fault.
 
@@ -91,11 +92,11 @@
 	\end{itemize}
 \end{exampleblock}
 \end{frame}
-\begin{frame}[plain]
+\begin{frame}[standout]
 \begin{center}
-\huge{Side effects are lies. 
+\huge{Side effects are lies. }
 
-Your function promises to do \emph{one} thing, but it also does other \emph{hidden} things.}
+\large{Your function promises to do \emph{one} thing, but it also does other \emph{hidden} things.}
 \end{center}
 \end{frame}
 \begin{frame}{Side effects -- Cont.}
@@ -122,8 +123,8 @@ An \emph{effect system} is a type system that tracks the \emph{effects} of a pro
 \begin{exampleblock}{Examples}
 	\begin{itemize}
 	\item Checked exceptions in Java
-	\item Monads 
-	\item Scala 3.0 \texttt{CanThrow} effect
+	\item Monads (?)
+	\item Scala 3.0 \texttt{Capabilities}? (Next :))
 	\item Algebraic Effects
 	\end{itemize}
 \end{exampleblock}
@@ -148,10 +149,10 @@ An \emph{effect system} is a type system that tracks the \emph{effects} of a pro
 
 \begin{frame}{IO usage}
 \begin{itemize}
-	\item \texttt{IO} is a monad, so it can be used in a for-comprehension
+	\item \texttt{IO} can be used in a for-comprehension
 	\item The for-comprehension is a way to manage side effects
 	\begin{itemize}
-		\item Programs became first class citizens of the language
+		\item \emph{Programs} became first class citizens of the language
 	\end{itemize}
 	\item After composing the I/O operations, we can run the program (i.e., the end of the world)
 \end{itemize}
@@ -163,15 +164,23 @@ An \emph{effect system} is a type system that tracks the \emph{effects} of a pro
 	\item IO is the way to model I/O operations
 	\item What about other computational effects?
 	\begin{itemize}
-		\item Exceptions
-		\item State
-		\item Async computations (second part of this talk)
+		\item Exceptions?
+		\item State?
+		\item Async computations?
 	\end{itemize}
-	\item We need a way to compose different effects
+	\item We need a way to \textbf{compose} different effects
+	\item \textbf{Remember}!! Everything is about \emph{composition} :)
 	\item Several approaches:
 	\begin{itemize}
 		\item Monad Stacks
+		\begin{itemize}
+			\item Namely, create a new monad that is a composition of \emph{two or more} monads
+		\end{itemize}
 		\item Monad Transformers Library
+		\begin{itemize}
+			\item A comprehensive library that provides a way to compose different effects
+			\item It is a way to reduce the boilerplate of monad stacks
+		\end{itemize}
 	\end{itemize}
 \end{itemize}
 \end{frame}
@@ -191,9 +200,9 @@ An \emph{effect system} is a type system that tracks the \emph{effects} of a pro
 	\item A Parser is similar to a State monad
 \end{itemize}
 \begin{tcolorbox}
-\begin{minted}{scala}
-final case class Parser[A]  (parse: String => Option[(A, String)]) 
-final case class State[S, A](run:   S =>             (A, S))
+\begin{minted}[fontsize=\scriptsize]{scala}
+final case class Parser[A](parse: String => Option[(A, String)]) 
+final case class State[S, A](run: S => (A, S))
 \end{minted}
 \end{tcolorbox}
 \begin{itemize}
@@ -205,18 +214,19 @@ final case class State[S, A](run:   S =>             (A, S))
 \section{Monad Stacks}
 \begin{frame}{Monad Transformers}
 \begin{exampleblock}{Definition}
-A \emph{monad transformer} is a type that takes a monad as an argument and returns a monad as a result.
+A \emph{monad transformer} is a \textbf{type constructor} that takes a monad as \emph{an argument} and returns a new monad that combines the effects of both monads.
 \end{exampleblock}
 \begin{alertblock}{Why}
 	\begin{itemize}
-		\item Reducing the boilerplate of nested monads
-		\item Composing different effects
+		\item Composing multiple effect types in a \textbf{single computation}
+		\item Avoiding the boilerplate of deeply nested monads
+		\item Providing a unified interface for working with combined effects
 	\end{itemize}
 \end{alertblock}
-\begin{exampleblock}{Example}
+\begin{exampleblock}{Common Examples}
 	\begin{itemize}
-		\item \texttt{OptionT} is a monad transformer that adds the effect of \texttt{Option} to another monad
-		\item \texttt{StateT} is a monad transformer that adds the effect of \texttt{State} to another monad
+		\item \texttt{OptionT[M, A]}: Adds optionality effects to monad \texttt{M}
+		\item \texttt{StateT[S, M, A]}: Adds stateful computation to monad \texttt{M}
 	\end{itemize}
 \end{exampleblock}
 \end{frame}
@@ -227,6 +237,9 @@ A \emph{monad transformer} is a type that takes a monad as an argument and retur
 		\item \texttt{T} is a type constructor that takes as input a type constructor \texttt{M}, a type \texttt{A}, and returns a type \texttt{T[M, A]}.
 		\item If \texttt{M} is a monad, then \texttt{T[M, *]} is also a monad
 		\item \texttt{lift} is a polymorphic function with type \texttt{M[A] => T[M, A]} that lifts a monadic value into the transformed monad
+		\begin{itemize}
+			\item \texttt{lift} is a way to inject a value of type \texttt{M[A]} into the transformed monad \texttt{T[M, A]}
+		\end{itemize}
 	\end{itemize}
 \end{alertblock}
 \begin{tcolorbox}
@@ -281,12 +294,15 @@ def failAndIO: OptionT[IO, Unit] =
 \end{tikzpicture}
 \begin{tcolorbox}
 \begin{minted}{scala}
-final case class StateT[S, M[_], A](runStateT: S => M[(A, S)])
+final case class StateT[S, M[_], A](
+	runStateT: S => M[(A, S)]
+)
 
 type StateTFixS[S] = [M[_], A] =>> StateT[S, M, A]
-  given [S]: MonadTransformer[StateTFixS[S]] with
-    def lift[M[_]: Monad, A](m: M[A]): StateT[S, M, A] =
-      StateT(s => m.map((_, s)))
+
+given [S]: MonadTransformer[StateTFixS[S]] with
+	def lift[M[_]: Monad, A](m: M[A]): StateT[S, M, A] =
+		StateT(s => m.map((_, s)))
 \end{minted}
 \end{tcolorbox}
 \end{center}
@@ -315,13 +331,14 @@ def stateAndIO: StateT[String, IO, Unit] =
 \end{frame}
 \begin{frame}[fragile]{Monad Stacks}
 \begin{itemize}
-	\item Monad transformers are a way to compose different effects
+	\item Monad transformers allow composing different effects
 	\begin{itemize}
-		\item Injecting from one monad to another (i.e., giving the effect of IO to a State monad)
+		\item They inject capabilities from one monad into another
+		\item For example, adding IO effects to a State monad
 	\end{itemize}
-	\item It is possible to compose multiple monad transformers
+	\item Multiple transformers can be stacked together
 	\begin{itemize}
-		\item This is called a \emph{monad stack}
+		\item Creating what's known as a \emph{monad stack}
 	\end{itemize}
 \end{itemize}
 \begin{tcolorbox}
@@ -331,25 +348,33 @@ type Program[A] = StateT[String, OptionT[IO, _], A]
 \end{tcolorbox}
 
 \begin{itemize}
-	\item This type represents programs that perform I/O (inner monad) and can potentially fail (first transformer, OptionT). If the program does not fail, it will modify the state (second transformer, StateT).
+	\item This type represents programs that:
+	\begin{itemize}
+		\item Perform I/O operations (innermost layer - IO)
+		\item Can potentially fail (middle layer - OptionT)
+		\item Manipulate string state (outermost layer - StateT)
+	\end{itemize}
 \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{Monad Transformers -- Order matter}
 \begin{itemize}
-	\item The order in which you compose monad transformers matters
+	\item The order of monad transformers in a stack matters significantly
 \end{itemize}
 \begin{tcolorbox}
 \begin{minted}{scala}
+// Different stacking orders produce different semantics
+type Program1[A] = StateT[String, OptionT[IO, _], A]
 type Program2[A] = OptionT[StateT[String, IO, _], A]
 \end{minted}
 \end{tcolorbox}
 \begin{itemize}
-	\item This type rapresents programs that perform I/O modifying a state. Even if the state is changed, the program can return an empty result.
+	\item In \mintinline{scala}{Program1}, state changes are lost if failure occurs
+	\item In \mintinline{scala}{Program2}, state changes persist even when returning None
 \end{itemize}
 \begin{multicols}{2}
 	\centering
-	\resizebox*{0.3\textwidth}{!}{
+	\resizebox*{0.25\textwidth}{!}{
 	\begin{tikzpicture}
 		\node[circle, fill=black!5, draw, minimum size=4.5 cm,label=above:{\mintinline{scala}{IO}}, label=below:{\mintinline{scala}{Program1}}] {};
 		\node[circle, fill=black!20, draw, minimum size=3 cm,label=above:{\mintinline{scala}{Option}}] {};
@@ -357,9 +382,9 @@ type Program2[A] = OptionT[StateT[String, IO, _], A]
 	\end{tikzpicture}
 	}
 	\centering
-	\resizebox*{0.3\textwidth}{!}{
+	\resizebox*{0.25\textwidth}{!}{
 	\begin{tikzpicture}
-		\node[circle, fill=black!5, draw, minimum size=4.5 cm,label=above:{\mintinline{scala}{IO}}, label=below:{\mintinline{scala}{Program1}}] {};
+		\node[circle, fill=black!5, draw, minimum size=4.5 cm,label=above:{\mintinline{scala}{IO}}, label=below:{\mintinline{scala}{Program2}}] {};
 		\node[circle, fill=black!20, draw, minimum size=3 cm,label=above:{\mintinline{scala}{State}}] {};
 		\node[circle, fill=black!30, draw, minimum size=1.5 cm,label=above:{\mintinline{scala}{Option}}] {};
 	\end{tikzpicture}}
@@ -399,9 +424,9 @@ def char: Parser[Char] =
 \begin{frame}[fragile,shrink=35]{Monad Transformers -- Limits}
 \begin{exampleblock}{Manual Lifting of Operations}
 	\begin{itemize}
-		\item The necessity for manual lifting operations when using monad transformers complicates code.
-  \item Leads to significant boilerplate, overshadowing the application's logic.
-  \item Code alteration for stack changes demands extensive rewriting.
+		\item The necessity for \emph{manual lifting operations} when using monad transformers \textbf{complicates code}.
+  \item Leads to \textbf{significant boilerplate}, overshadowing the application's \emph{actual logic}.
+  \item Code alteration for stack changes demands \textbf{extensive rewriting}.
 	\end{itemize}
 \begin{tcolorbox}
 \begin{minted}{scala}
@@ -415,8 +440,8 @@ def manualLifting: OptionT[IO, String] =
 \end{exampleblock}
 \begin{exampleblock}{Principle of Least Privilege}
 	\begin{itemize}
-		\item Fixing the monad stack violates the principle of least privilege.
-		\item Forces unnecessary capabilities onto parts of the application.
+		\item Fixing the monad stack violates the \textbf{principle of least privilege}.
+		\item Forces \emph{unnecessary capabilities} onto parts of the application.
 	\end{itemize}
 \begin{tcolorbox}
 \begin{minted}{scala}
@@ -431,8 +456,8 @@ yield column.sum
 \end{exampleblock}
 \begin{exampleblock}{Encapsulation Violation}
 \begin{itemize}
-	\item Monad transformers tightly couple code to specific effect modeling.
-	\item Ties logic to a specific implementation, hindering changes.
+	\item Monad transformers \textbf{tightly couple} code to specific effect modeling.
+	\item Ties logic to a \emph{specific implementation}, severely \textbf{hindering future changes}.
 \end{itemize}
 \end{exampleblock}
 \end{frame}
@@ -441,14 +466,14 @@ yield column.sum
 \begin{frame}{Monad Transformers Library}
 	\begin{exampleblock}{What}
 		\begin{itemize}
-			\item MTL simplifies side effect management in functional programming by abstractly describing side effects and allowing for flexible interpretation.
-			\item State-of-the-art scala library: cats-mtl \url{https://typelevel.org/cats-mtl/}
+			\item MTL \emph{simplifies} side effect management in functional programming by \textbf{abstractly describing} side effects and allowing for \emph{flexible interpretation}.
+			\item State-of-the-art scala library: \texttt{cats-mtl} \url{https://typelevel.org/cats-mtl/}
 		\end{itemize}
 	\end{exampleblock}
 	\begin{exampleblock}{How}
 		\begin{itemize}
-			\item MTL leverages type classes to define \emph{families} of effects, each characterized by operations that express possible actions.
-		  \item This approach facilitates \emph{modular}, \emph{composable} \emph{side-effect} handling, significantly reducing boilerplate and improving code maintainability.
+			\item MTL leverages \textbf{type classes} to define \emph{families} of effects, each characterized by operations that express possible actions.
+		  \item This approach facilitates \textbf{modular}, \textbf{composable} \emph{side-effect} handling, \emph{significantly} reducing boilerplate and \textbf{improving code maintainability}.
 		\end{itemize}
 	\end{exampleblock}	
 \end{frame}
@@ -462,7 +487,7 @@ trait State[M[_], S]:
 	def get: M[S]
 	def set(s: S): M[Unit]
 
-// Usefull for context bound
+// Useful for context bound
 type HasState[S] = [M[_]] =>> State[M, S]
 
 // Given a M 
@@ -478,7 +503,7 @@ def update[S, M[_]: Monad: HasState[S]](f: S => S): M[Unit] =
 	\frametitle{Composition of Multiple Effects}
 	
 	\begin{itemize}
-		\item MTL excels in combining different side effects with ease, removing the rigidity observed with traditional monad transformers.
+			\item MTL \textbf{excels} in combining \emph{different side effects} with ease, removing the \textbf{rigidity} observed with traditional monad transformers.
 	\end{itemize}
 \begin{tcolorbox}
 	
@@ -500,12 +525,12 @@ effects[StateT[Int, IO, _]].runStateT(10).unsafeRun()
 \end{itemize}	
 \end{frame}
 \begin{frame}[fragile]
-	\frametitle{MTL as an Effect System}
-	
-	\begin{itemize}
-		\item MTL can be viewed as an early example of an effect system, formally describing the side effects of computations.
-		\item It supports defining arbitrary effect classes at the granularity most suited to the problem, offering a design tool for effect-oriented systems.
-	\end{itemize}
+	\frametitle{MTL as an \textbf{Effect System}}
+		
+		\begin{itemize}
+			\item MTL can be viewed as an \emph{early example} of an effect system, \textbf{formally describing} the side effects of computations.
+			\item It supports defining \emph{arbitrary effect classes} at the granularity most suited to the problem, offering a \textbf{powerful design tool} for effect-oriented systems.
+		\end{itemize}
 \begin{tcolorbox}
 \begin{minted}{scala}
 // Effect definition
@@ -551,19 +576,21 @@ type TestRunner = State[Runtime, _]
 %===============================================================================
 \section{Algebraic Effects}
 \begin{frame}{Understanding Algebraic Effects}
-	\textbf{What are Algebraic Effects?}
-	\begin{itemize}
-			\item A formalism to model side effects in pure functional programming.
-			\item Provide a separation between the definition of effects and their implementation.
-			\item Allow for compositional and modular effect handling.
-	\end{itemize}
+	\begin{exampleblock}{What are Algebraic Effects?}
+		\begin{itemize}
+			\item A formalism to model side effects in pure functional programming
+			\item Provide a separation between the definition of effects and their implementation
+			\item Allow for compositional and modular effect handling
+		\end{itemize}
+	\end{exampleblock}
 
-	\textbf{Key Concepts:}
-	\begin{itemize}
-			\item \textbf{Effects and Handlers:} Effects are operations that represent side effects, while handlers define their implementation.
-			\item \textbf{Composability:} Effects can be combined, allowing complex operations to be built from simpler ones.
-			\item \textbf{Purity:} Keeps the core logic pure by abstracting effects, making code easier to reason about and test.
-	\end{itemize}
+	\begin{alertblock}{Key Concepts}
+		\begin{itemize}
+			\item \textbf{Effects and Handlers:} Effects are operations that represent side effects, while handlers define their implementation
+			\item \textbf{Composability:} Effects can be combined, allowing complex operations to be built from simpler ones
+			\item \textbf{Purity:} Keeps the core logic pure by abstracting effects, making code easier to reason about and test
+		\end{itemize}
+	\end{alertblock}
 \end{frame}
 \begin{frame}{Algebraic Effects -- Langauge and Libraries}
 \begin{itemize}
@@ -572,7 +599,7 @@ type TestRunner = State[Runtime, _]
 	\item \textbf{Effekt}: a library for Scala 3.0 that provides a way to model algebraic effects \url{https://b-studios.de/scala-effekt/}
 \end{itemize}
 \end{frame}
-\begin{frame}[fragile, shrink=15]{Algebraic Effects -- Effekt}
+\begin{frame}[fragile, shrink=40]{Algebraic Effects -- Effekt}
 	\begin{itemize}
 		\item Definie an effect
 	\end{itemize}
@@ -605,28 +632,36 @@ def ambList[R](prog: Flip => Control[R]): Control[List[R]] =
       		ts <- resume(true)
       		fs <- resume(false)
     		} yield ts ++ fs 
-			}
+		}
   } handle { amb => prog(amb) map { r => List(r) } }
 \end{minted}
 \end{tcolorbox}
+\begin{itemize}
+	\item We will see that Scala 3.0 Capabilities are similar to algebraic effects :)
+\end{itemize}
 \end{frame}
 \section{Conclusion}
 \begin{frame}{Conclusion}
-	\begin{itemize}
-		\item Effect systems are a way to manage side effects in functional programming
-		\item Monad transformers are a way to compose different effects
-		\item MTL is a library that simplifies side effect management in functional programming
-		\item Algebraic effects are a formalism to model side effects in pure functional programming
-		\item \textbf{NEXT}: Async computations with direct style (scala 3.0)
-	\end{itemize}
+	\begin{alertblock}{Key Takeaways}
+		\begin{itemize}
+			\item Effect systems provide systematic management of side effects in functional programming
+			\item Monad transformers enable composition of different effectful computations
+			\item MTL abstracts effect handling through type classes, improving modularity and testability
+			\item Algebraic effects offer a powerful formalism separating effect definition from implementation
+		\end{itemize}
+	\end{alertblock}
+	
+	\begin{exampleblock}{Coming Next}
+		\begin{itemize}
+		\item 
+		\textbf{Asynchronous Computations with Direct Style and Introduction to Capabilities}
+		\end{itemize}
+	\end{exampleblock}
 \end{frame}
 %/////////
 \frame{\titlepage}
 %/////////
 
-%===============================================================================
-\section*{\refname}
-%===============================================================================
 
 %%%%
 \setbeamertemplate{page number in head/foot}{}

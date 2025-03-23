@@ -2,7 +2,6 @@
 .DS_Store
 
 # sbt specific
-project
 dist/*
 target/
 lib_managed/
@@ -31,3 +30,8 @@ metals.sbt
 .idea
 .idea_modules
 /.worksheet/
+project/project
+project/target
+target/*
+.bsp/
+

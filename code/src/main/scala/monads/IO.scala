@@ -41,7 +41,7 @@ object IO:
 
 @main def ioExample =
   val program = for
-  data <- IO.getLine
-  _ <- IO.putStrLn(s"You entered: $data")
+    data <- IO.getLine
+    _    <- IO.putStrLn(s"You entered: $data")
   yield ()
   program.unsafeRun()
