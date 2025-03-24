@@ -71,17 +71,10 @@
 %	\tableofcontents
 %\end{frame}
 
-\begin{frame}{Acknowledgments}
-	This presentation is mainly based on the work of \emph{Giacomo Cavalieri} that I would like to thank for his work and his support.
-	
-	Any error or misunderstanding is my fault.
-
-	Thesis: \url{https://github.com/giacomocavalieri/master-thesis}
-\end{frame}
 \section{Effect Systems}
 \begin{frame}{Side effects}
 \begin{alertblock}{Definition}
- A \emph{side effect} is any application state change that is observable outside the called function other than its return value.
+ A \emph{side effect} is any application state change that is \textbf{observable outside} the called function \emph{other than} its \textbf{return value}.
 \end{alertblock}
 \begin{exampleblock}{Examples}
 	\begin{itemize}
@@ -118,13 +111,16 @@
 
 \begin{frame}{Effect system}
 \begin{exampleblock}{Definition}
-An \emph{effect system} is a type system that tracks the \emph{effects} of a program.
+An \textbf{effect system} is a type system that \emph{tracks} the \textbf{effects} of a program, making them \emph{explicit} at the type level.
 \end{exampleblock}
 \begin{exampleblock}{Examples}
 	\begin{itemize}
 	\item Checked exceptions in Java
-	\item Monads (?)
-	\item Scala 3.0 \texttt{Capabilities}? (Next :))
+	\item Monads
+	\begin{itemize}
+		\item I/O monad and State monad and their combination
+	\end{itemize}
+	%\item Scala 3.0 \texttt{Capabilities}? (Next :))
 	\item Algebraic Effects
 	\end{itemize}
 \end{exampleblock}
@@ -132,6 +128,9 @@ An \emph{effect system} is a type system that tracks the \emph{effects} of a pro
 	\begin{itemize}
 		\item Focus on Monads 
 		\item Briefly introduce Algebraic Effects
+		\begin{itemize}
+			\item A bridge to Scala 3.0 Capabilities (Next :))
+		\end{itemize}
 	\end{itemize}
 \end{alertblock}
 \end{frame}
@@ -150,11 +149,11 @@ An \emph{effect system} is a type system that tracks the \emph{effects} of a pro
 \begin{frame}{IO usage}
 \begin{itemize}
 	\item \texttt{IO} can be used in a for-comprehension
-	\item The for-comprehension is a way to manage side effects
-	\begin{itemize}
-		\item \emph{Programs} became first class citizens of the language
-	\end{itemize}
-	\item After composing the I/O operations, we can run the program (i.e., the end of the world)
+		\item The for-comprehension is a way to manage side effects
+		\begin{itemize}
+			\item Programs became \textbf{first class citizens} of the language
+		\end{itemize}
+		\item After composing the I/O operations, we can \textbf{run} the program (i.e., the \emph{end of the world})
 \end{itemize}
 \inputminted[firstline=42,lastline=48]{scala}{code/src/main/scala/monads/IO.scala}
 \end{frame}
@@ -172,11 +171,11 @@ An \emph{effect system} is a type system that tracks the \emph{effects} of a pro
 	\item \textbf{Remember}!! Everything is about \emph{composition} :)
 	\item Several approaches:
 	\begin{itemize}
-		\item Monad Stacks
+		\item \textbf{Monad Stacks}
 		\begin{itemize}
 			\item Namely, create a new monad that is a composition of \emph{two or more} monads
 		\end{itemize}
-		\item Monad Transformers Library
+		\item \textbf{Monad Transformers Library}
 		\begin{itemize}
 			\item A comprehensive library that provides a way to compose different effects
 			\item It is a way to reduce the boilerplate of monad stacks
@@ -186,11 +185,11 @@ An \emph{effect system} is a type system that tracks the \emph{effects} of a pro
 \end{frame}
 \begin{frame}[fragile]{Motivating Example -- Parser}
 \begin{itemize}
-	\item A parser is a program that takes a string and returns an Option of a parsed value and the remaining string
+	\item A parser is a program that takes a \texttt{String} and returns an \texttt{Option} of a parsed value and the remaining \texttt{String}
 \end{itemize}
 \inputminted[firstline=5, lastline=5]{scala}{code/src/main/scala/monads/Parser.scala}
 \begin{itemize}
-	\item A Parser can be modelled as a monad
+	\item A \texttt{Parser} can be modelled as a monad
 \end{itemize}
 \inputminted[firstline=7, lastline=17]{scala}{code/src/main/scala/monads/Parser.scala}
 
@@ -233,14 +232,14 @@ A \emph{monad transformer} is a \textbf{type constructor} that takes a monad as 
 \begin{frame}[fragile]{Monad Transformers -- Cont.}
 \begin{alertblock}{Formal Definition}
 	A monad transformer is a tuple \texttt{(T, lift)} where:
-	\begin{itemize}
-		\item \texttt{T} is a type constructor that takes as input a type constructor \texttt{M}, a type \texttt{A}, and returns a type \texttt{T[M, A]}.
-		\item If \texttt{M} is a monad, then \texttt{T[M, *]} is also a monad
-		\item \texttt{lift} is a polymorphic function with type \texttt{M[A] => T[M, A]} that lifts a monadic value into the transformed monad
 		\begin{itemize}
-			\item \texttt{lift} is a way to inject a value of type \texttt{M[A]} into the transformed monad \texttt{T[M, A]}
+			\item \texttt{T} is a \textbf{type constructor} that takes as input a type constructor \texttt{M}, a type \texttt{A}, and returns a type \texttt{T[M, A]}.
+			\item If \texttt{M} is a monad, then \texttt{T[M, *]} is \emph{also} a monad
+			\item \texttt{lift} is a \textbf{polymorphic function} with type \texttt{M[A] => T[M, A]} that \emph{lifts} a monadic value into the transformed monad
+			\begin{itemize}
+				\item \texttt{lift} is a way to \textbf{inject} a value of type \texttt{M[A]} into the transformed monad \texttt{T[M, A]}
+			\end{itemize}
 		\end{itemize}
-	\end{itemize}
 \end{alertblock}
 \begin{tcolorbox}
 \begin{minted}{scala}
@@ -288,7 +287,7 @@ def failAndIO: OptionT[IO, Unit] =
 \end{frame}
 \begin{frame}[fragile]{Monad Transformers -- StateT}
 \begin{center}	
-\begin{tikzpicture}
+\begin{tikzpicture}[scale=0.85, transform shape]
 	\node[circle, fill=black!5, draw, minimum size=3 cm,label=above:{\mintinline{scala}{M}}, label=below:{\mintinline{scala}{StateT[S, M[_], _]}}] {};
 	\node[circle, fill=black!20, draw, minimum size=1.5 cm,label=above:{\mintinline{scala}{State}}] {};
 \end{tikzpicture}
@@ -308,7 +307,7 @@ given [S]: MonadTransformer[StateTFixS[S]] with
 \end{center}
 \end{frame}
 \begin{frame}[fragile]{Monad Transformers -- StateT}
-As with OptionT, we can compose the State effect with another monad
+As with \texttt{OptionT}, we can compose the \texttt{State} effect with another monad
 \begin{tcolorbox}
 \begin{minted}{scala}
 // Operations
@@ -331,12 +330,12 @@ def stateAndIO: StateT[String, IO, Unit] =
 \end{frame}
 \begin{frame}[fragile]{Monad Stacks}
 \begin{itemize}
-	\item Monad transformers allow composing different effects
+	\item Monad transformers allow \textbf{composing different effects}
 	\begin{itemize}
-		\item They inject capabilities from one monad into another
+		\item They \emph{inject} capabilities from one monad into another
 		\item For example, adding IO effects to a State monad
 	\end{itemize}
-	\item Multiple transformers can be stacked together
+	\item Multiple transformers can be \textbf{stacked together}
 	\begin{itemize}
 		\item Creating what's known as a \emph{monad stack}
 	\end{itemize}
@@ -350,9 +349,9 @@ type Program[A] = StateT[String, OptionT[IO, _], A]
 \begin{itemize}
 	\item This type represents programs that:
 	\begin{itemize}
-		\item Perform I/O operations (innermost layer - IO)
-		\item Can potentially fail (middle layer - OptionT)
-		\item Manipulate string state (outermost layer - StateT)
+		\item Perform \textbf{I/O operations} (innermost layer - \texttt{IO})
+		\item Can potentially \textbf{fail} (middle layer - \texttt{OptionT})
+		\item Manipulate \textbf{string state} (outermost layer - \texttt{StateT})
 	\end{itemize}
 \end{itemize}
 \end{frame}
@@ -663,6 +662,13 @@ def ambList[R](prog: Flip => Control[R]): Control[List[R]] =
 %/////////
 
 
+\begin{frame}{Acknowledgments}
+	This presentation is mainly based on the work of \emph{Giacomo Cavalieri} that I would like to thank for his work and his support.
+	
+	Any error or misunderstanding is my fault.
+
+	Thesis: \url{https://github.com/giacomocavalieri/master-thesis}
+\end{frame}
 %%%%
 \setbeamertemplate{page number in head/foot}{}
 %/////////

@@ -24,7 +24,7 @@ object Fail:
     def fail[A] = Fail[M].fail.lift[T]
   // format: on
 
-  object Examples:
+  object Examples extends App:
     object WithExplicitUsing:
       def divide[M[_]: Monad](dividend: Int, divisor: Int)(using
         F: Fail[M]
@@ -39,7 +39,10 @@ object Fail:
       if divisor == 0 then Fail[M].fail
       else Monad.pure(dividend / divisor)
 
-    def interpretDivide: Unit =
-      val res1: Int = divide[IO](10, 20).unsafeRun()
-      val res2: Option[Int] =
-        divide[OptionT[Identity, _]](10, 20).runOptionT
+@main def runFailExample =
+  import Fail.Examples.*
+  val res1 =
+    divide[OptionT[Identity, _]](10, 0).runOptionT // None
+  println(res1)
+  val res2 = divide[IO](10, 0).unsafeRun() // throws exception
+  println(res2) // never reach this

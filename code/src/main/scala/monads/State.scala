@@ -17,19 +17,23 @@ object State:
           f(result1).runState(state1)
         )
 
-  object Examples:
-    def incrementCounter: State[Int, String] =
-      get.flatMap(counter =>
-        set(counter + 1).flatMap(_ =>
-          get.flatMap(newCounter =>
-            Monad.pure(f"counter is: $newCounter")
-          )
+object Examples extends App:
+  import State.*
+  def incrementCounter: State[Int, String] =
+    get.flatMap(counter =>
+      set(counter + 1).flatMap(_ =>
+        get.flatMap(newCounter =>
+          Monad.pure(f"counter is: $newCounter")
         )
       )
+    )
 
-    def incrementCounterForComprehension: State[Int, String] =
-      for
-        counter    <- State.get
-        _          <- State.set(counter + 1)
-        newCounter <- State.get
-      yield f"counter is: $newCounter"
+  def incrementCounterForComprehension: State[Int, String] =
+    for
+      counter    <- State.get
+      _          <- State.set(counter + 1)
+      newCounter <- State.get
+    yield f"counter is: $newCounter"
+
+  val (result, _) = incrementCounterForComprehension.runState(0)
+  println(result)

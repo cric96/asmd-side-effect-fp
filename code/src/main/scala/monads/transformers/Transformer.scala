@@ -50,6 +50,8 @@ object Examples:
     val result2: (Option[Int], String) =
       program2.runOptionT.runStateT("initial state").unsafeRun()
 
+    println(result1)
+    println(result2)
   object Parser:
     import monads.State
 

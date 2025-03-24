@@ -31,7 +31,7 @@ object OptionT:
 
     def failAndIO: OptionT[IO, Unit] =
       for
-        _ <- IO.putStrLn("Hello, world!").lift
+        _ <- IO.putLine("Hello, world!").lift
         _ <- OptionT.fail: OptionT[IO, Unit]
-        _ <- IO.putStrLn("Unreachable").lift
+        _ <- IO.putLine("Unreachable").lift
       yield ()

@@ -1,11 +1,12 @@
 package monads.mtl
 
 import scala.compiletime.summonInline
-import monads.{Identity, IO, Monad}
-import monads.Monad.{given, *}
+import monads.{IO, Identity, Monad}
+import monads.Monad.{*, given}
+import monads.mtl.Design.Examples.updateAge
 import monads.transformers.MonadTransformer
 import monads.transformers.StateT
-import monads.transformers.StateT.{given, *}
+import monads.transformers.StateT.{*, given}
 import monads.transformers.StateT.Examples.State
 
 final case class UserId(id: Int)
@@ -45,8 +46,7 @@ object Design:
           if user.age < 18
           then Delete
           else user.copy(age = user.age + 1)
-
-
+    
     object Production:
       final case class DatabaseConnection()
       final case class Runtime(connection: DatabaseConnection)
@@ -90,21 +90,22 @@ object Design:
         def save(user: User) = updateUsers(_ + (user.id -> user))
         def delete(userId: UserId) = updateUsers(_ - userId)
 
-      object Test:
-        def testUpdateAgeUpdatesTheUser: Unit =
-          val user = User(UserId(1), "Giacomo", 24)
-          val runtime = Runtime(Map(user.id -> user))
-          val finalRuntime = updateAge[TestRunner](user.id).runStateT(runtime)._2
-          val finalUser = finalRuntime.users.get(user.id).get
+object Test extends App:
+  import Design.Examples.Testing.*
+  def testUpdateAgeUpdatesTheUser: Unit =
+    val user = User(UserId(1), "Giacomo", 24)
+    val runtime = Runtime(Map(user.id -> user))
+    val finalRuntime = updateAge[TestRunner](user.id).runStateT(runtime)._2
+    val finalUser = finalRuntime.users.get(user.id).get
 
-          assert(finalRuntime.users.size == 1)
-          assert(finalUser.id == user.id)
-          assert(finalUser.name == user.name)
-          assert(finalUser.age == user.age + 1)
+    assert(finalRuntime.users.size == 1)
+    assert(finalUser.id == user.id)
+    assert(finalUser.name == user.name)
+    assert(finalUser.age == user.age + 1)
 
-        def testUpdateAgeDeletesUnderageUsers: Unit =
-          val user = User(UserId(1), "Giacomo", 12)
-          val runtime = Runtime(Map(user.id -> user))
-          val finalRuntime =
-            updateAge[TestRunner](user.id).runStateT(runtime)._2
-          assert(finalRuntime.users.isEmpty)   
+  def testUpdateAgeDeletesUnderageUsers: Unit =
+    val user = User(UserId(1), "Giacomo", 12)
+    val runtime = Runtime(Map(user.id -> user))
+    val finalRuntime =
+      updateAge[TestRunner](user.id).runStateT(runtime)._2
+    assert(finalRuntime.users.isEmpty)

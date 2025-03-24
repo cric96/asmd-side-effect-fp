@@ -1,7 +1,7 @@
 package monads.mtl
-import monads.Monad
-import monads.Monad.{given, *}
-import monads.transformers.{StateT, MonadTransformer, given, *}
+import monads.{Identity, Monad}
+import monads.Monad.{*, given}
+import monads.transformers.{MonadTransformer, StateT, *, given}
 
 type HasState[S] = [M[_]] =>> State[M, S]
 trait State[M[_], S]:

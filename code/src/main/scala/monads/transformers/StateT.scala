@@ -38,8 +38,8 @@ object StateT:
     def stateAndIO: StateT[String, IO, Unit] =
       for
         state <- StateT.get[String, IO]
-        _     <- IO.putStrLn(f"Current state: $state").lift
-        _     <- IO.putStrLn("Setting new state").lift
+        _     <- IO.putLine(f"Current state: $state").lift
+        _     <- IO.putLine("Setting new state").lift
         _     <- StateT.set[String, IO]("bar")
       yield ()
 

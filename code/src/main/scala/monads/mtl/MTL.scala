@@ -1,29 +1,29 @@
 package monads.mtl
 
-import monads.IO
-import monads.Monad
-import monads.Monad.{given, *}
-import monads.transformers.{StateT, OptionT, given, *}
+import monads.{IO, Identity, Monad}
+import monads.Monad.{*, given}
+import monads.transformers.{OptionT, StateT, *, given}
 import monads.transformers.StateT.StateTFixS
 import monads.transformers.MonadTransformer
+
 import scala.util.Random
 
 object TransformersProblemsExamples:
   def manualLifting: StateT[Int, OptionT[IO, _], String] =
     for
-      _ <- IO.putStrLn("asd").lift[OptionT].lift[StateTFixS[Int]]
+      _ <- IO.putLine("asd").lift[OptionT].lift[StateTFixS[Int]]
       _ <- OptionT.fail[IO, Any].lift[StateTFixS[Int]]
     yield "asd"
 
   def manualLifting2: OptionT[IO, String] =
     for
-      _ <- IO.putStrLn("test").lift[OptionT]
+      _ <- IO.putLine("test").lift[OptionT]
       _ <- OptionT.fail[IO, Any]
     yield "result"
 
   def manualLifting3: OptionT[StateT[Int, IO, _], String] =
     for
-      _ <- IO.putStrLn("asd").lift[StateTFixS[Int]].lift[OptionT]
+      _ <- IO.putLine("asd").lift[StateTFixS[Int]].lift[OptionT]
       _ <- OptionT.fail[StateT[Int, IO, _], Any]
     yield "result"
 
@@ -74,15 +74,21 @@ object MTL:
 
     import monads.Identity
 
-    def interpretEffects: Unit =
-      type Stack1 = OptionT[StateT[Int, Identity, _], _]
-      val res1: (Option[String], Int) =
-        effects[Stack1].runOptionT.runStateT(1)
+@main
+def interpretEffects: Unit =
+  import MTL.Examples.*
+  type Stack1 = OptionT[StateT[Int, Identity, _], _]
+  val res1: (Option[String], Int) =
+    effects[Stack1].runOptionT.runStateT(1)
 
-      type Stack2 = StateT[Int, OptionT[Identity, _], _]
-      val res2: Option[(String, Int)] =
-        effects[Stack2].runStateT(1).runOptionT
+  type Stack2 = StateT[Int, OptionT[Identity, _], _]
+  val res2: Option[(String, Int)] =
+    effects[Stack2].runStateT(1).runOptionT
 
-      type Stack3 = StateT[Int, IO, _]
-      val res3: (String, Int) =
-        effects[Stack3].runStateT(1).unsafeRun()
+  type Stack3 = StateT[Int, IO, _]
+  val res3: (String, Int) =
+    effects[Stack3].runStateT(1).unsafeRun()
+
+  println(res1)
+  println(res2)
+  println(res3)

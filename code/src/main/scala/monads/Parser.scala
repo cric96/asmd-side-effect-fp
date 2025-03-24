@@ -21,9 +21,6 @@ object Parser:
   def char: Parser[Char] =
     Parser(string => string.headOption.map((_, string.tail)))
 
-  def consumeN(n: Int): Parser[List[Char]] =
-    List.fill(n)(char).sequence
-
   object Examples:
     def consumeTwo: Parser[(Char, Char)] =
       for

@@ -13,7 +13,7 @@ object IO:
       def flatMap[B](f: A => IO[B]): IO[B] =
         IO(() => f(m.unsafeRun()).unsafeRun())
 
-  def putStrLn(s: String): IO[Unit] = IO(() => println(s))
+  def putLine(s: String): IO[Unit] = IO(() => println(s))
   def getLine: IO[String] = IO(() => scala.io.StdIn.readLine())
 
   object Examples:
@@ -30,18 +30,18 @@ object IO:
 
       val times = 10
       val step = for
-        _      <- putStrLn("URL of the resource: ")
+        _      <- putLine("URL of the resource: ")
         url    <- getLine
         result <- urlToResource(url).retry(times, shouldRetry)
         _ <- result match
-          case None    => putStrLn("Failed after 10 retries")
-          case Some(_) => putStrLn("Got a response")
+          case None    => putLine("Failed after 10 retries")
+          case Some(_) => putLine("Got a response")
       yield ()
       step.forever
 
 @main def ioExample =
   val program = for
     data <- IO.getLine
-    _    <- IO.putStrLn(s"You entered: $data")
+    _    <- IO.putLine(s"You entered: $data")
   yield ()
   program.unsafeRun()
